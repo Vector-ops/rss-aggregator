@@ -36,9 +36,12 @@ func (s *APIServer) Run() error {
 	v1Router.Get("/error", controllers.HandlerErr)
 	v1Router.Post("/users", userHandler.CreateUser)
 	v1Router.Get("/users", authHandler.MiddlewareAuth(userHandler.GetUser))
+	v1Router.Get("/posts", authHandler.MiddlewareAuth(userHandler.GetPostsForUser))
 	v1Router.Post("/feeds", authHandler.MiddlewareAuth(feedHandler.CreateFeed))
 	v1Router.Get("/feeds", feedHandler.GetFeeds)
 	v1Router.Post("/feed_follows", authHandler.MiddlewareAuth(feedFollowHandler.CreateFeedFollow))
+	v1Router.Get("/feed_follows", authHandler.MiddlewareAuth(feedFollowHandler.GetFeedFollow))
+	v1Router.Delete("/feed_follows/{feedFollowId}", authHandler.MiddlewareAuth(feedFollowHandler.DeleteFeedFollow))
 
 	s.Router.Mount("/v1", v1Router)
 

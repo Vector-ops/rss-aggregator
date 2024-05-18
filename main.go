@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"time"
 
 	"github.com/Vector-ops/rss-aggregator/internal/database"
 	"github.com/go-chi/chi/v5"
@@ -35,6 +36,10 @@ func main() {
 		log.Fatal("Can't connect to database")
 	}
 
+	db := database.New(conn)
+
+	go startScraping(db, 10, time.Minute)
+
 	router := chi.NewRouter()
 
 	router.Use(cors.Handler(cors.Options{
@@ -46,6 +51,6 @@ func main() {
 		MaxAge:           300,
 	}))
 
-	srv := NewAPIServer(portString, database.New(conn), router)
+	srv := NewAPIServer(portString, db, router)
 	log.Fatal(srv.Run())
 }
