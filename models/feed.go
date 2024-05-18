@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/Vector-ops/rss-aggregator/internal/database"
@@ -8,12 +9,13 @@ import (
 )
 
 type Feed struct {
-	ID        uuid.UUID `json:"id,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	Url       string    `json:"url,omitempty"`
-	UserID    uuid.UUID `json:"user_id,omitempty"`
+	ID        uuid.UUID    `json:"id,omitempty"`
+	CreatedAt time.Time    `json:"created_at,omitempty"`
+	UpdatedAt time.Time    `json:"updated_at,omitempty"`
+	Name      string       `json:"name,omitempty"`
+	Url       string       `json:"url,omitempty"`
+	UserID    uuid.UUID    `json:"user_id,omitempty"`
+	LastFetch sql.NullTime `json:"last_fetch"`
 }
 
 func TransformFeed(feed database.Feed) Feed {

@@ -24,3 +24,13 @@ func TransformFeedFollow(feedFollow database.FeedFollow) FeedFollow {
 		FeedID:    feedFollow.FeedID,
 	}
 }
+
+func TransformManyFeedFollows(dbFeedFollows []database.FeedFollow) []FeedFollow {
+	feedFollows := []FeedFollow{}
+
+	for _, dbFeedFollow := range dbFeedFollows {
+		feedFollows = append(feedFollows, FeedFollow(dbFeedFollow))
+	}
+
+	return feedFollows
+}
