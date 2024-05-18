@@ -50,3 +50,16 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	utils.RespondWithJSON(w, http.StatusOK, models.TransformUser(user))
 }
+
+func (h *UserHandler) GetPostsForUser(w http.ResponseWriter, r *http.Request, user database.User) {
+	posts, err := h.store.GetPostsForUsers(r.Context(), database.GetPostsForUsersParams{
+		UserID: user.ID,
+		Limit:  10,
+	})
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't get posts: %v", err))
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, models.TransformManyPosts(posts))
+}

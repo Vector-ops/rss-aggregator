@@ -9,6 +9,7 @@ import (
 	"github.com/Vector-ops/rss-aggregator/internal/database"
 	"github.com/Vector-ops/rss-aggregator/models"
 	"github.com/Vector-ops/rss-aggregator/utils"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 )
 
@@ -44,7 +45,36 @@ func (h *FeedFollowHandler) CreateFeedFollow(w http.ResponseWriter, r *http.Requ
 	})
 	if err != nil {
 		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't create feed follows: %v", err))
+		return
 	}
 
 	utils.RespondWithJSON(w, http.StatusCreated, models.TransformFeedFollow(feedFollow))
+}
+
+func (h *FeedFollowHandler) GetFeedFollow(w http.ResponseWriter, r *http.Request, user database.User) {
+	feedFollows, err := h.store.GetFeedFollows(r.Context(), user.ID)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't create feed follows: %v", err))
+		return
+	}
+	utils.RespondWithJSON(w, http.StatusOK, models.TransformManyFeedFollows(feedFollows))
+}
+
+func (h *FeedFollowHandler) DeleteFeedFollow(w http.ResponseWriter, r *http.Request, user database.User) {
+	feedFollowIDStr := chi.URLParam(r, "feedFollowId")
+	feedFollowId, err := uuid.Parse(feedFollowIDStr)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't parse feed follow id: %v", err))
+		return
+	}
+	err = h.store.DeleteFeedFollows(r.Context(), database.DeleteFeedFollowsParams{
+		ID:     feedFollowId,
+		UserID: user.ID,
+	})
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't delete feed follow: %v", err))
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, struct{}{})
 }
